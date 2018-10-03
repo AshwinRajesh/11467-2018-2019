@@ -51,13 +51,14 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="TeleOpTank", group="11467")
-@Disabled
+
 public class TeleOpTank extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
+    private double speed = 0;
 
     @Override
     public void runOpMode() {
@@ -101,9 +102,16 @@ public class TeleOpTank extends LinearOpMode {
             leftPower  = -gamepad1.left_stick_y ;
             rightPower = -gamepad1.right_stick_y ;
 
+            if (leftPower == 1 || leftPower == -1) {
+                speed += 0.02;
+            } else {
+                if (speed > 0) {
+                    speed -= 0.02;
+                }
+            }
             // Send calculated power to wheels
-            leftDrive.setPower(leftPower);
-            rightDrive.setPower(rightPower);
+            leftDrive.setPower(speed * leftPower);
+            rightDrive.setPower(speed * rightPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
