@@ -78,7 +78,7 @@ public class EncoderDrive extends LinearOpMode {
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
+    static final double     DRIVE_SPEED             = 0.01;
     static final double     TURN_SPEED              = 0.5;
 
     @Override
@@ -115,16 +115,16 @@ public class EncoderDrive extends LinearOpMode {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  12,  12, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderDrive(DRIVE_SPEED,  12,  12, 30.0);  // S1: Forward 47 Inches with 5 Sec timeout
 
-        sleep(1000);     // pause for servos to move
+
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
 
     /*
-     *  Method to perfmorm a relative move, based on encoder counts.
+     *  Method to perform a relative move, based on encoder counts.
      *  Encoders are not reset as the move is based on the current position.
      *  Move will stop if any of three conditions occur:
      *  1) Move gets to the desired position
