@@ -224,6 +224,10 @@ public class GyroDrive extends LinearOpMode {
                 leftDrive.setPower(leftSpeed);
                 rightDrive.setPower(rightSpeed);
 
+
+
+
+
                 // Display drive status for the driver.
                 telemetry.addData("Err/St",  "%5.1f/%5.1f",  error, steer);
                 telemetry.addData("Target",  "%7d:%7d",      newLeftTarget,  newRightTarget);

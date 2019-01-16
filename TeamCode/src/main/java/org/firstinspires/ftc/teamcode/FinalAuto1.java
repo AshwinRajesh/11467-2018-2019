@@ -32,14 +32,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -73,9 +72,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="EncoderDrive", group="11467")
+@Autonomous(name="FinalAutoCrater", group="11467")
 
-public class EncoderDrive extends LinearOpMode {
+public class FinalAuto1 extends LinearOpMode {
 
     /* Declare OpMode members. */
     Orientation angles;
@@ -85,6 +84,8 @@ public class EncoderDrive extends LinearOpMode {
     private DcMotor lift = null;
     private Servo grab = null;
     private ElapsedTime runtime = new ElapsedTime();
+    ColorSensor colorSensor;
+    boolean hitGold = false;
 
     static final double     COUNTS_PER_MOTOR_REV    = 210 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
@@ -93,6 +94,7 @@ public class EncoderDrive extends LinearOpMode {
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.05;
     static final double     TURN_SPEED              = 0.5;
+    BNO055IMU imu;
 
     @Override
     public void runOpMode() {
@@ -110,26 +112,84 @@ public class EncoderDrive extends LinearOpMode {
         telemetry.addData("Status", "Resetting Encoders");    //
         telemetry.update();
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        lift.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Path0",  "Starting at %7d :%7d",
                           leftDrive.getCurrentPosition(),
                           rightDrive.getCurrentPosition());
         telemetry.update();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-
+        encoderLift(190);
+        grab.setPosition(0.6);
+        sleep(3000);
+        encoderDrive(0.3, -5, -5, 30);
+        //turnRobot(-180);
+        //encoderDrive(0.3, 10, 10, 30);
+        //turnRobot(-90);
+        //encoderDrive(0.3, 15, 15, 30);
+        //Color Sensor
+        /*turnRobot(-45);
+        encoderDrive(0.2, 3, 3, 30);
+        if(getColor().equals("GOLD")) {
+            hitGold = true;
+            encoderDrive(0.2, 8, 8, 30);
+            encoderDrive(0.2, -8, -8, 30);
+        }
+        encoderDrive(0.2, -3, -3, 30);
+        turnRobot(45);
+        if(!hitGold){
+            encoderDrive(0.2, 2, 2, 30);
+            if(getColor().equals("GOLD")){
+                hitGold = true;
+                encoderDrive(0.2, 5, 5, 30);
+                encoderDrive(0.2, -5, -5, 30);
+            }
+            encoderDrive(0.2, -2, -2, 30);
+        }
+        if(!hitGold){
+            turnRobot(45);
+            encoderDrive(0.2, 3, 3, 30);
+            if(getColor().equals("GOLD")) {
+                hitGold = true;
+                encoderDrive(0.2, 8, 8, 30);
+                encoderDrive(0.2, -8, -8, 30);
+            }
+            encoderDrive(0.2, -3, -3, 30);
+            turnRobot(-45);
+        }*/
+        /*turnRobot(-90);
+        encoderDrive(0.3, 45, 45, 30);
+        turnRobot(-40);
+        encoderDrive(0.3, 25, 25, 30);
+        //encoderDrive(0.3, -10, -10, 30);
+        turnRobot(180);
+        //encoderDrive(0.6, 1, 1, 30);*/
 
 
         telemetry.addData("Path", "Complete");
@@ -145,12 +205,12 @@ public class EncoderDrive extends LinearOpMode {
      *  3) Driver stops the opmode running.
      *
      */
+
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {
         int newLeftTarget;
         int newRightTarget;
-
         if (leftInches < 0 && rightInches < 0) {
             rightDrive.setDirection(DcMotor.Direction.REVERSE);
             leftDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -158,55 +218,101 @@ public class EncoderDrive extends LinearOpMode {
             rightDrive.setDirection(DcMotor.Direction.FORWARD);
             leftDrive.setDirection(DcMotor.Direction.REVERSE);
         }
-
-        // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
-            // Determine new target position, and pass to motor controller
             newLeftTarget = leftDrive.getCurrentPosition() + (int)(Math.abs(leftInches) * COUNTS_PER_INCH);
             newRightTarget = rightDrive.getCurrentPosition() + (int)(Math.abs(rightInches) * COUNTS_PER_INCH);
             leftDrive.setTargetPosition(newLeftTarget);
             rightDrive.setTargetPosition(newRightTarget);
-
-            // Turn On RUN_TO_POSITION
             leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            // reset the timeout time and start motion.
             runtime.reset();
             leftDrive.setPower(Math.abs(speed));
             rightDrive.setPower(Math.abs(speed));
-
             while (opModeIsActive() &&
                    (runtime.seconds() < timeoutS) &&
                    (leftDrive.isBusy() && rightDrive.isBusy())) {
 
-                // Display it for the driver.
                 telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
                 telemetry.addData("Path2",  "Running at %7d :%7d",
                                             leftDrive.getCurrentPosition(),
                                             rightDrive.getCurrentPosition());
                 telemetry.update();
             }
-
-            // Stop all motion;
             leftDrive.setPower(0);
             rightDrive.setPower(0);
-
-            // Turn off RUN_TO_POSITION
             leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
             rightDrive.setDirection(DcMotor.Direction.FORWARD);
             leftDrive.setDirection(DcMotor.Direction.REVERSE);
-
-            sleep(250);   // optional pause after each move
+            //sleep(250);
         }
     }
 
+    public void turnRobot(double angle) {
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+
+        double speed = 1;
+        double error;
+
+        double initial = convertAngle(angles.firstAngle);
+        double difference = Math.abs(initial - convertAngle(angle));
+
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-        // send the info back to driver station using telemetry function.
+        while (Math.abs(convertAngle(angle) - convertAngle(angles.firstAngle)) > 1) {
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            error = Math.abs(convertAngle(angle) - convertAngle(angles.firstAngle));
+            speed = Math.pow((error / difference), 0.95) / 5;
+
+            if (initial < convertAngle(angle)) {
+                leftDrive.setPower(-speed);
+                rightDrive.setPower(speed);
+            } else {
+                leftDrive.setPower(speed);
+                rightDrive.setPower(-speed);
+            }
+
+            telemetry.addData("Current Angle", convertAngle(angles.firstAngle));
+            telemetry.update();
+        }
+
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+
+        sleep(250);   // optional pause after each move
+    }
+
+    public String getColor() {
+
+        if (colorSensor.red() > 100 && colorSensor.blue() > 100 && colorSensor.green() > 100) {
+            telemetry.addData("Color", "SILVER");
+            telemetry.update();
+            return "SILVER";
+        } else if (colorSensor.red() > colorSensor.blue() && colorSensor.green() > colorSensor.blue()) {
+            telemetry.addData("Color", "GOLD");
+            telemetry.update();
+            return "GOLD";
+        } else {
+            telemetry.addData("Color", "NONE");
+            telemetry.update();
+            return "NONE";
+        }
+
+    }
+
+    public double convertAngle(double angle) {
+        if (angle >= 0) {
+            return angle;
+        } else {
+            return 360 - Math.abs(angle);
+        }
+    }
 
     public void encoderLift(double inches) {
 
@@ -217,7 +323,7 @@ public class EncoderDrive extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            target = lift.getCurrentPosition() + (int) (Math.abs(inches) * COUNTS_PER_INCH);
+            target = lift.getCurrentPosition() + (int)(Math.abs(inches) * COUNTS_PER_INCH);
             lift.setTargetPosition(target);
 
             // Turn On RUN_TO_POSITION
@@ -225,10 +331,10 @@ public class EncoderDrive extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
-            lift.setPower(0.3);
+            lift.setPower(-1.0);
 
             while (opModeIsActive() &&
-                    (leftDrive.isBusy() && rightDrive.isBusy())) {
+                    (lift.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Target", target);
@@ -244,9 +350,8 @@ public class EncoderDrive extends LinearOpMode {
 
             lift.setDirection(DcMotor.Direction.REVERSE);
 
-            sleep(250);   // optional pause after each move
+            //sleep(250);   // optional pause after each move
         }
     }
-
 }
 
